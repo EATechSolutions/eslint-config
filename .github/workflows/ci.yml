@@ -17,30 +17,56 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
     - name: Set increment patch
-      if: contains(github.event.pull_request.title, 'patch')
+      if: contains(github.event.pull_request.title, '[patch]')
       run: npm version patch
     - name: Set increment minor
-      if: contains(github.event.pull_request.title, 'minor')
+      if: contains(github.event.pull_request.title, '[minor]')
       run: npm version minor
     - name: Set increment major
-      if: contains(github.event.pull_request.title, 'major')
+      if: contains(github.event.pull_request.title, '[major]')
       run: npm version major
     - name: Commit
       # Unsure if this conditional is necessary
-      if: contains(github.event.pull_request.title, 'patch') || contains(github.event.pull_request.title, 'minor') || contains(github.event.pull_request.title, 'major')
+      if: contains(github.event.pull_request.title, '[patch]') || contains(github.event.pull_request.title, '[minor]') || contains(github.event.pull_request.title, '[major]')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         RELEASE_MESSAGE: ${{ github.event.pull_request.title }}
       run: |
         git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:$GITHUB_REF --follow-tags;
-    #     LATEST_TAG=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1);
-    #     curl --request POST \
-    #     --url https://api.github.com/repos/$GITHUB_REPOSITORY/releases \
-    #     --header 'authorization: Bearer $GITHUB_TOKEN' \
-    #     --header 'content-type: application/json' \
-    #     --data '{
-    #       "tag_name": "$LATEST_TAG",
-    #       "name": "$LATEST_TAG",
-    #       "body": "$RELEASE_MESSAGE",
-    #       "draft": true
-    #     }'
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Get tag name
+        run: |
+          LATEST_TAG=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1);
+          echo "latestTag={LATEST_TAG}" >> $GITHUB_ENV
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ latestTag }}
+          release_name: Release ${{ latestTag }}
+          body: ${{ github.event.pull_request.title }}
+          draft: false
+          prerelease: false
+
+  publish_gpr:
+    name: Publish to Github Packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: https://npm.pkg.github.com/
+          scope: '@${{ github.event.organization.login }}'
+      - run: yarn install --frozen-lockfile
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
