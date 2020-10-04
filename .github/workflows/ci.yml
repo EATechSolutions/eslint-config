@@ -6,6 +6,8 @@ jobs:
   bump_version_and_release:
     name: Bump version
     if: github.event.pull_request.state == 'closed' && github.event.pull_request.merged == true
+    outputs:
+      new_sha: ${{ steps.sha.outputs.SHA }}
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -25,7 +27,7 @@ jobs:
     - name: Set increment major
       if: contains(github.event.pull_request.title, '[major]')
       run: npm version major
-    - name: Commit
+    - name: Push tag
       if: contains(github.event.pull_request.title, '[patch]') || contains(github.event.pull_request.title, '[minor]') || contains(github.event.pull_request.title, '[major]')
       uses: ad-m/github-push-action@master
       with:
@@ -45,14 +47,27 @@ jobs:
         body: ${{ github.event.pull_request.title }}
         draft: false
         prerelease: false
+    - name: get sha
+      id: sha
+      run: |
+        sha_new=$(git rev-parse HEAD)
+        echo $sha_new
+        echo "::set-output name=SHA::$sha_new"
+    - run:
+          echo ${{ steps.sha.outputs.SHA }}
         
   publish:
     name: Publish to Github Packages
     needs: [bump_version_and_release]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ needs.bump_version_and_release.outputs.new_sha }}
+          fetch-depth: 0
+      - name: Setup registry
+        uses: actions/setup-node@v1
         with:
           node-version: '12.x'
           registry-url: https://npm.pkg.github.com/
