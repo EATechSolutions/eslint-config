@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [closed]
 jobs:
-  bump_version:
+  bump_version_and_release:
     name: Bump version
     if: github.event.pull_request.state == 'closed' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
@@ -33,32 +33,22 @@ jobs:
         RELEASE_MESSAGE: ${{ github.event.pull_request.title }}
       run: |
         git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:$GITHUB_REF --follow-tags;
-
-  release:
-    name: Create Release
-    needs: [bump_version]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Get tag name
-        run: |
-          echo "tags=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1)" >> $GITHUB_ENV
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ env.tags }}
-          release_name: ${{ env.tags }}
-          body: ${{ github.event.pull_request.title }}
-          draft: false
-          prerelease: false
-
-  publish_gpr:
+        echo "tags=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1)" >> $GITHUB_ENV
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ env.tags }}
+        release_name: ${{ env.tags }}
+        body: ${{ github.event.pull_request.title }}
+        draft: false
+        prerelease: false
+        
+  publish:
     name: Publish to Github Packages
-    needs: [release]
+    needs: [bump_version_and_release]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
