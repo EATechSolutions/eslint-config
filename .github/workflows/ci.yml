@@ -25,22 +25,36 @@ jobs:
     - name: Set increment major
       if: contains(github.event.pull_request.title, 'major')
       run: npm version major
-    - name: Commit
-      # Unsure if this conditional is necessary
-      if: contains(github.event.pull_request.title, 'patch') || contains(github.event.pull_request.title, 'minor') || contains(github.event.pull_request.title, 'major')
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        RELEASE_MESSAGE: ${{ github.event.pull_request.title }}
-      run: |
-        git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:$GITHUB_REF --follow-tags;
-        LATEST_TAG=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1);
-        curl --request POST \
-        --url https://api.github.com/repos/$GITHUB_REPOSITORY/releases \
-        --header 'authorization: Bearer $GITHUB_TOKEN' \
-        --header 'content-type: application/json' \
-        --data '{
-          "tag_name": "$LATEST_TAG",
-          "name": "$LATEST_TAG",
-          "body": "$RELEASE_MESSAGE",
-          "draft": true
-        }'
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Changes in this Release
+          - First Change
+          - Second Change
+        draft: false
+        prerelease: false
+    # - name: Commit
+    #   # Unsure if this conditional is necessary
+    #   if: contains(github.event.pull_request.title, 'patch') || contains(github.event.pull_request.title, 'minor') || contains(github.event.pull_request.title, 'major')
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     RELEASE_MESSAGE: ${{ github.event.pull_request.title }}
+    #   run: |
+    #     git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:$GITHUB_REF --follow-tags;
+    #     LATEST_TAG=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1);
+    #     curl --request POST \
+    #     --url https://api.github.com/repos/$GITHUB_REPOSITORY/releases \
+    #     --header 'authorization: Bearer $GITHUB_TOKEN' \
+    #     --header 'content-type: application/json' \
+    #     --data '{
+    #       "tag_name": "$LATEST_TAG",
+    #       "name": "$LATEST_TAG",
+    #       "body": "$RELEASE_MESSAGE",
+    #       "draft": true
+    #     }'
