@@ -30,9 +30,11 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-        - name: Step 1
-          run: |
-            echo "Name=Elroy" >> $GITHUB_ENV
-        - name: Step 2
-          run: |
-            echo ${{ env.Name }}
+      - name: version
+        run: npm version patch
+      - name: Step 1
+        run: |
+          echo "Name=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1)" >> $GITHUB_ENV
+      - name: Step 2
+        run: |
+          echo ${{ env.Name }}
