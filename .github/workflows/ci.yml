@@ -42,19 +42,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Get tag name
-        id: tags
         run: |
-          LATEST_TAG=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1);
-          echo "$(LATEST_TAG)"
-          echo "::set-output name=tag_name::$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1)"
+          echo "tags=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1)" >> $GITHUB_ENV
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: $tag_name
-          release_name: Release ${{ steps.tags.outputs.tag_name }}
+          tag_name: ${{ env.tags }}
+          release_name: ${{ env.tags }}
           body: ${{ github.event.pull_request.title }}
           draft: false
           prerelease: false
