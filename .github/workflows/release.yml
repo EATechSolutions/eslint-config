@@ -30,6 +30,8 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: version
         run: npm version patch
       - name: Step 1
