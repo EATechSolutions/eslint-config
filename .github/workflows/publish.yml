@@ -1,0 +1,19 @@
+name: Publish
+on:
+  release:
+    types: [published]
+jobs:
+  publish_gpr:
+    name: Publish to Github Packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: https://npm.pkg.github.com/
+          scope: '@${{ github.event.organization.login }}'
+      - run: yarn install --frozen-lockfile
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
