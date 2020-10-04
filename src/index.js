@@ -1,7 +1,7 @@
 // Testing area
 
 function x() {
-  const v = 123
+   const v = 1234
 
   return v * v
 }
