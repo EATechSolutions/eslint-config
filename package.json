@@ -1,7 +1,7 @@
 {
   "name": "@eatechsolutions/eslint-config",
   "description": "Linting and code formatting rules",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "",
   "bundledDependencies": [
     "@typescript-eslint/eslint-plugin",
