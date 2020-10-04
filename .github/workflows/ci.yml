@@ -27,11 +27,12 @@ jobs:
       run: npm version major
     - name: Commit
       if: contains(github.event.pull_request.title, '[patch]') || contains(github.event.pull_request.title, '[minor]') || contains(github.event.pull_request.title, '[major]')
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        RELEASE_MESSAGE: ${{ github.event.pull_request.title }}
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        tags: true
+    - name: Get version
       run: |
-        git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:$GITHUB_REF --follow-tags;
         echo "tags=$(git tag  | grep -E '^v[0-9]' | sort -V | tail -1)" >> $GITHUB_ENV
     - name: Create Release
       id: create_release
