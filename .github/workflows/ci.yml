@@ -6,8 +6,8 @@ jobs:
   bump_version_and_release:
     name: Bump version
     if: github.event.pull_request.state == 'closed' && github.event.pull_request.merged == true
-    outputs:
-      new_sha: ${{ steps.sha.outputs.SHA }}
+    # outputs:
+    #   new_sha: ${{ steps.sha.outputs.SHA }}
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -32,6 +32,7 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.event.pull_request.base.ref }}
         tags: true
     - name: Get version
       run: |
@@ -47,14 +48,14 @@ jobs:
         body: ${{ github.event.pull_request.title }}
         draft: false
         prerelease: false
-    - name: get sha
-      id: sha
-      run: |
-        sha_new=$(git rev-parse HEAD)
-        echo $sha_new
-        echo "::set-output name=SHA::$sha_new"
-    - run:
-          echo ${{ steps.sha.outputs.SHA }}
+    # - name: get sha
+    #   id: sha
+    #   run: |
+    #     sha_new=$(git rev-parse HEAD)
+    #     echo $sha_new
+    #     echo "::set-output name=SHA::$sha_new"
+    # - run:
+    #       echo ${{ steps.sha.outputs.SHA }}
         
   publish:
     name: Publish to Github Packages
@@ -64,8 +65,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: ${{ needs.bump_version_and_release.outputs.new_sha }}
-          fetch-depth: 0
+          ref: ${{ github.event.pull_request.base.ref }}
+        #   fetch-depth: 0
       - name: Setup registry
         uses: actions/setup-node@v1
         with:
