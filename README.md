@@ -4,6 +4,11 @@ Linting and formatting with Eslint and Prettier
 
 ## Setup
 
+### Add npm registry for @eatechsolutions in `.npmrc`
+```
+  @eatechsolutions:registry=https://npm.pkg.github.com/
+```
+
 ### Install for JavaScript projects
 
 ```
