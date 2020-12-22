@@ -7,25 +7,25 @@ Linting and formatting with Eslint and Prettier
 ### Install for JavaScript projects
 
 ```
-yarn add -D eslint eslint-import-resolver-babel-module @rbs-path/eslint-config-path
+yarn add -D eslint eslint-import-resolver-babel-module @eatechsolutions/eslint-config
 ```
 
 Your ESLint config for a JavaScript project should extend:
 
 ```
-@rbs-path/eslint-config-path
+@eatechsolutions/eslint-config
 ```
 
 ### Install for TypeScript projects
 
 ```
-yarn add -D eslint eslint-import-resolver-typescript @rbs-path/eslint-config-path
+yarn add -D eslint eslint-import-resolver-typescript @eatechsolutions/eslint-config
 ```
 
 Your ESLint config for a TypeScript project should extend:
 
 ```
-@rbs-path/eslint-config-path/typescript
+@eatechsolutions/eslint-config/typescript
 ```
 
 #### Prettier
@@ -33,7 +33,7 @@ Your ESLint config for a TypeScript project should extend:
 In your package.json, add:
 
 ```
-"prettier": "@rbs-path/eslint-config-path/prettier"
+"prettier": "@eatechsolutions/eslint-config/prettier"
 
 ...
 
