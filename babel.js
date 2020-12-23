@@ -6,6 +6,7 @@ module.exports = {
     'prettier/react',
     'plugin:prettier/recommended'
   ],
+  parser: '@babel/eslint-parser',
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',
@@ -47,7 +48,8 @@ module.exports = {
     'import/resolver': {
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx']
-      }
+      },
+      'babel-module': {}
     },
     react: {
       version: 'detect'

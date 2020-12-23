@@ -12,13 +12,29 @@ Linting and formatting with Eslint and Prettier
 ### Install for JavaScript projects
 
 ```
+yarn add -D eslint @eatechsolutions/eslint-config
+```
+
+Your ESLint config (`.eslintrc`) for a JavaScript project should extend: `@eatechsolutions/eslint-config`:
+
+```
+{
+  "extends": "@eatechsolutions/eslint-config"
+}
+```
+
+### Install for JavaScript projects with babel
+
+```
 yarn add -D eslint eslint-import-resolver-babel-module @eatechsolutions/eslint-config
 ```
 
-Your ESLint config for a JavaScript project should extend:
+Your ESLint config (`.eslintrc`) for a JavaScript project should extend: `@eatechsolutions/eslint-config`:
 
 ```
-@eatechsolutions/eslint-config
+{
+  "extends": "@eatechsolutions/eslint-config/babel"
+}
 ```
 
 ### Install for TypeScript projects
