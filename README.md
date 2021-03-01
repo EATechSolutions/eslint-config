@@ -84,3 +84,8 @@ Recommended VSCode config:
 ```
 
 Recommended VSCode plugin: `dbaeumer.vscode-eslint`
+
+if using CRA, in the `.env` file add
+```
+ESLINT_NO_DEV_ERRORS=true
+```
